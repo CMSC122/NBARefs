@@ -7,6 +7,8 @@ CREATE TABLE referees
 
 CREATE TABLE calls
   (game_name varchar(50),
+   away_team varchar(50),
+   home_team varchar(50),
    time varchar(10),
    period varchar(5),
    call_type varchar(50),
