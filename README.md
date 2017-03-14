@@ -7,7 +7,9 @@ When using the exported VM, please use the cs122-project directory for the websi
 
 Contents:
 A database of NBA .. .docx - Word document containing the original proposal of our project
+
 NBA.tar.gz - Compressed folder containing the website configuration. See the introduction of this file for more info
+
 NBARefs.db - The final database used for statistical analysis
 NBAStat_Final.xlsx - The cleaned up version of the PDFs using Adobe Acrobat
 Output.csv - The file mapping each referee to the game codes of the games they officiated. It is the csv version of the referees table in the final database
