@@ -6,6 +6,44 @@ import math
 import sqlite3
 import csv
 
+top_refs = ['Mark Lindsay',
+'Tony Brothers',
+'Lauren Holtkamp',
+'Steve Anderson',
+'Kevin Scott',
+'Bill Kennedy',
+'J.T. Orr',
+'Nick Buchert',
+'James Capers',
+'Derek Richardson']
+top_10 = ['Jason Phillips', 
+'Monty McCutchen',  
+'Scott Foster', 
+'Josh Tiven',   
+'Kane Fitzgerald', 
+'Eric Lewis',   
+'Marc Davis',
+'Ken Mauer',  
+'Tom Washington',
+'Tony Brothers']  
+top_teams = ['Warriors', 'Spurs', 'Cavaliers', 'Raptors',
+    'Thunder', 'Clippers', 'Hawks', 'Celtics']
+bottom_refs = ['Bennie Adams',
+'Gary Zielinski',
+'David Jones',
+'Josh Tiven',
+'Tony Brown',
+'Derrick Stafford',
+'Leroy Richardson',
+'Matt Boland',
+'Mike Callahan',
+'Tre Maddox']
+star_players = ['Stephen Curry', 'Kawhi Leonard', 'Kevin Durant', 
+'Russell Westbrook', 'Kyle Lowry', 'Paul George', 'Carmelo Anthony', 
+'Dwyane Wade', 'LeBron James','Anthony Davis', 'James Harden', 
+'Giannis Antetokounmpo', 'Kyrie Irving', 'Jimmy Butler', 'Marc Gasol',
+ 'Klay Thompson', 'LaMarcus Aldridge', 'Pau Gasol', 'John Wall']
+
 def generate_ranking(filename = 'ranking.csv', num = 300):
     '''
     returns a ranking of the best referees in the NBA by ratio of 
@@ -19,6 +57,9 @@ def generate_ranking(filename = 'ranking.csv', num = 300):
     with the total number of calls, incorrect calls, incorrect 
     non calls, total incorrect calls, and incorrect to correct call
     ratio.
+    An integer corresponding to the minimum number of calls we 
+    want to have for the cutoff
+
     '''
 
     ranking = pandas.read_csv(filename)
@@ -27,6 +68,13 @@ def generate_ranking(filename = 'ranking.csv', num = 300):
     return sorted_ranking
 
 def variation_coefficient(filename = 'ranking.csv', number = 300):
+
+    '''
+    Returns the standard deviation, mean and variation_coefficient
+    for the incorrect calls, the error ratio for a ranking without
+    cutoff, and the error ratio for a ranking with cutoff. 
+    Note that only the latter two are used in the paper
+    '''
 
     ranking = pandas.read_csv(filename)
 
@@ -48,29 +96,16 @@ def variation_coefficient(filename = 'ranking.csv', number = 300):
     print('The stats for unsorted errors are', stdev_error, mean_error, error_variation_coefficient)
     print('The stats for sorted errors are', stdev_error_sort, mean_error_sort, error_variation_coefficient_sort)
 
-top_refs = ['Mark Lindsay',
-'Tony Brothers',
-'Lauren Holtkamp',
-'Steve Anderson',
-'Kevin Scott',
-'Bill Kennedy',
-'J.T. Orr',
-'Nick Buchert',
-'James Capers',
-'Derek Richardson']
 
-top_10 = ['Jason Phillips', 
-'Monty McCutchen',  
-'Scott Foster', 
-'Josh Tiven',   
-'Kane Fitzgerald', 
-'Eric Lewis',   
-'Marc Davis',
-'Ken Mauer',  
-'Tom Washington',
-'Tony Brothers']   
 
+ 
 def analysis(filename = 'proportion_shooting.csv'):
+    '''
+    Returns the mean and standard deviation for a certain Statistic
+    for the first 10 and last 10 elements of a given csv file.
+    Very often throughout the paper we try to get information for the
+    same statistic for the top and bottom 10 (players, referees, etc)
+    '''
 
     shots = pandas.read_csv(filename)
     mean_top = shots[0:10]['Ratio'].mean()
@@ -80,6 +115,12 @@ def analysis(filename = 'proportion_shooting.csv'):
     return mean_top, stdev_top, mean_acc, stdev_acc
 
 def proportion_shooting(filename = 'NBARefs.db'):
+    '''
+    This function computes the proportion of shooting fouls 
+    over total fouls amongst the calls by a given referee in our
+    top 10 by accuracy and top 10 by number of calls. It
+    generates a csv file that is a suitable input for analysis()
+    '''
     con = sqlite3.connect(filename)
 
     cur = con.cursor()
@@ -117,20 +158,16 @@ def proportion_shooting(filename = 'NBARefs.db'):
     return rv
 
 
-top_teams = ['Warriors', 'Spurs', 'Cavaliers', 'Raptors',
-    'Thunder', 'Clippers', 'Hawks', 'Celtics']
-bottom_refs = ['Bennie Adams',
-'Gary Zielinski',
-'David Jones',
-'Josh Tiven',
-'Tony Brown',
-'Derrick Stafford',
-'Leroy Richardson',
-'Matt Boland',
-'Mike Callahan',
-'Tre Maddox']
+
 
 def better_teams(filename = 'NBARefs.db'):
+
+    '''
+    This function returns the proportion of games by top teams 
+    officiated by referees in the top and bottom 10 by accuracy 
+    lists. It also generates a csv file that is a suitable input
+    for the analysis() function
+    '''
 
     con = sqlite3.connect(filename)
 
@@ -174,13 +211,13 @@ def better_teams(filename = 'NBARefs.db'):
     f.close()
     return rv
     
-star_players = ['Stephen Curry', 'Kawhi Leonard', 'Kevin Durant', 
-'Russell Westbrook', 'Kyle Lowry', 'Paul George', 'Carmelo Anthony', 
-'Dwyane Wade', 'LeBron James','Anthony Davis', 'James Harden', 
-'Giannis Antetokounmpo', 'Kyrie Irving', 'Jimmy Butler', 'Marc Gasol',
- 'Klay Thompson', 'LaMarcus Aldridge', 'Pau Gasol', 'John Wall']
 
-def better_teams(filename = 'NBARefs.db'):
+
+def better_players(filename = 'NBARefs.db'):
+    '''
+    Returns the error ratios for calls involving the 
+    star players
+    '''
 
     con = sqlite3.connect(filename)
 
@@ -210,7 +247,11 @@ def better_teams(filename = 'NBARefs.db'):
     return rv    
 
 def analysis2(filename = 'star_players.csv'):
-
+    '''
+    This function is identical to analysis, but it 
+    returns the statistics for the entire file instead of
+    dividing it into two categories. 
+    '''
     shots = pandas.read_csv(filename)
     mean= shots['Ratio'].mean()
     stdev = math.sqrt(shots['Ratio'].var())
